@@ -8,7 +8,7 @@ provider "google" {
 module "gke_cluster" {
   source = "./modules/gcp-k8s"
 
-  cluster_name          = "my-cluster11"
+  cluster_name          = var.cluster_name
   region                = "us-west3-c"
   node_count            = 3
   node_machine_type     = "e2-standard-4"
