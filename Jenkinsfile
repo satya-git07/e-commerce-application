@@ -27,7 +27,7 @@ pipeline {
             }
         }
 
-        stage('Build & Push Images') {
+      stage('Build & Push Images') {
     steps {
         script {
             def services = [
@@ -36,28 +36,27 @@ pipeline {
                 'currency',
                 'image-provider',
                 'payment',
-                'product',
+                'product-catalog',
                 'quote',
                 'frontend',
                 'fraud-detection',
                 'flagd-ui',
                 'email',
-                'recommandation',
+                'recommendation',
                 'shipping',
                 'checkout',
                 'cart',
-                'ad-micro',
                 'ad',
-                'account'
+                'accounting'
             ]
 
             for (service in services) {
                 def imageName = "${DOCKER_HUB_USER}/${service}:latest3"
                 echo "🔧 Building and pushing image: ${imageName}"
 
-                def dockerfilePath = "${env.WORKSPACE}/${service}/Dockerfile"
+                def dockerfilePath = "${env.WORKSPACE}/src/${service}/Dockerfile"
                 if (fileExists(dockerfilePath)) {
-                    dir(service) {
+                    dir("src/${service}") {
                         try {
                             sh "docker build -t ${imageName} ."
                             sh "docker push ${imageName}"
