@@ -12,7 +12,9 @@ resource "google_container_cluster" "primary" {
   }
 
   remove_default_node_pool = false              # Default node pool exists
-
+  timeouts {
+    create = "90m"
+  }
   # Create node pool if variables are provided
   dynamic "node_pool" {
     for_each = var.create_node_pool == true ? [1] : []
