@@ -1,7 +1,7 @@
 resource "google_container_cluster" "primary" {
   name     = var.cluster_name          # GKE cluster name
   location = var.region                # Region for the cluster
-
+  project  = var.project_id  
   deletion_protection = var.deletion_protection  # Control deletion protection
 
   initial_node_count = var.node_count            # Number of initial nodes
