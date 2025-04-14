@@ -28,41 +28,51 @@ pipeline {
         }
 
         stage('Build & Push Images') {
-            steps {
-                script {
-                    def services = [
-                        'load-generator',
-                        'frontend-proxy',
-                        'currency',
-                        'image-provider',
-                        'payment',
-                        'product',
-                        'quote',
-                        'frontend',
-                        'fraud-detection',
-                        'flagd-ui',
-                        'email',
-                        'recommandation',
-                        'shipping',
-                        'checkout',
-                        'cart',
-                        'ad-micro',
-                        'ad',
-                        'account'
-                    ]
+    steps {
+        script {
+            def services = [
+                'load-generator',
+                'frontend-proxy',
+                'currency',
+                'image-provider',
+                'payment',
+                'product',
+                'quote',
+                'frontend',
+                'fraud-detection',
+                'flagd-ui',
+                'email',
+                'recommandation',
+                'shipping',
+                'checkout',
+                'cart',
+                'ad-micro',
+                'ad',
+                'account'
+            ]
 
-                    for (service in services) {
-                        def imageName = "${DOCKER_HUB_USER}/${service}:latest3"
-                        echo "Building and pushing image: ${imageName}"
+            for (service in services) {
+                def imageName = "${DOCKER_HUB_USER}/${service}:latest3"
+                echo "🔧 Building and pushing image: ${imageName}"
 
-                        dir(service) {
+                def dockerfilePath = "${env.WORKSPACE}/${service}/Dockerfile"
+                if (fileExists(dockerfilePath)) {
+                    dir(service) {
+                        try {
                             sh "docker build -t ${imageName} ."
                             sh "docker push ${imageName}"
+                            echo "✅ Successfully pushed ${imageName}"
+                        } catch (e) {
+                            echo "❌ Failed to build/push ${imageName}: ${e}"
                         }
                     }
+                } else {
+                    echo "⚠️ Skipping ${service} — Dockerfile not found in ${dockerfilePath}"
                 }
             }
         }
+    }
+}
 
         stage('Deploy to GKE (Optional)') {
             when {
