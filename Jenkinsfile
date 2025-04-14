@@ -77,28 +77,24 @@ pipeline {
             }
         }
 
-       stage("Creating the Cluster") {
+ stage("Creating the Cluster") {
     steps {
         withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
             dir('terraform') {
                 sh '''
-                    echo "🔐 Activating service account..."
                     gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-
-                    echo "🔧 Setting GCP project and region..."
                     gcloud config set project ${PROJECT_ID}
                     gcloud config set compute/region ${REGION}
+                    gcloud container clusters get-credentials ${CLUSTER_NAME}
 
-                    echo "📦 Initializing Terraform..."
                     terraform init
-
-                    echo "🚀 Applying Terraform to create GKE cluster..."
-                    terraform apply -auto-approve
+                    terraform apply -var="project_id=${PROJECT_ID}" -var="region=${REGION}" -auto-approve
                 '''
             }
         }
     }
 }
+
 
     }
 }
