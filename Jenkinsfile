@@ -27,51 +27,55 @@ pipeline {
             }
         }
 
-      stage('Build & Push Images') {
-    steps {
-        script {
-            def services = [
-                'load-generator',
-                'frontend-proxy',
-                'currency',
-                'image-provider',
-                'payment',
-                'product-catalog',
-                'quote',
-                'frontend',
-                'fraud-detection',
-                'flagd-ui',
-                'email',
-                'recommendation',
-                'shipping',
-                'checkout',
-                'cart',
-                'ad',
-                'accounting'
-            ]
+        stage('Build & Push Images') {
+            steps {
+                script {
+                    def services = [
+                        'load-generator',
+                        'frontend-proxy',
+                        'currency',
+                        'image-provider',
+                        'payment',
+                        'product-catalog',
+                        'quote',
+                        'frontend',
+                        'fraud-detection',
+                        'flagd-ui',
+                        'email',
+                        'recommendation',
+                        'shipping',
+                        'checkout',
+                        'cart',
+                        'ad',
+                        'accounting'
+                    ]
 
-            for (service in services) {
-                def imageName = "${DOCKER_HUB_USER}/${service}:latest3"
-                echo "🔧 Building and pushing image: ${imageName}"
+                    def parallelTasks = services.collectEntries { service ->
+                        ["${service}": {
+                            def imageName = "${DOCKER_HUB_USER}/${service}:latest3"
+                            def dockerfilePath = "${env.WORKSPACE}/src/${service}/Dockerfile"
+                            echo "🔧 Building and pushing image: ${imageName}"
 
-                def dockerfilePath = "${env.WORKSPACE}/src/${service}/Dockerfile"
-                if (fileExists(dockerfilePath)) {
-                    dir("src/${service}") {
-                        try {
-                            sh "docker build -t ${imageName} ."
-                            sh "docker push ${imageName}"
-                            echo "✅ Successfully pushed ${imageName}"
-                        } catch (e) {
-                            echo "❌ Failed to build/push ${imageName}: ${e}"
-                        }
+                            if (fileExists(dockerfilePath)) {
+                                dir("src/${service}") {
+                                    try {
+                                        sh "docker build -t ${imageName} ."
+                                        sh "docker push ${imageName}"
+                                        echo "✅ Successfully pushed ${imageName}"
+                                    } catch (e) {
+                                        echo "❌ Failed to build/push ${imageName}: ${e}"
+                                    }
+                                }
+                            } else {
+                                echo "⚠️ Skipping ${service} — Dockerfile not found in ${dockerfilePath}"
+                            }
+                        }]
                     }
-                } else {
-                    echo "⚠️ Skipping ${service} — Dockerfile not found in ${dockerfilePath}"
+
+                    parallel parallelTasks
                 }
             }
         }
-    }
-}
 
         stage('Deploy to GKE (Optional)') {
             when {
