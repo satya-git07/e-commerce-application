@@ -105,6 +105,31 @@ stage('Terraform: Apply Infrastructure') {
         }
 
 
+        stage('Deploy to GKE with Manifests') {
+    steps {
+        withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+            script {
+                sh '''
+                    echo "🔐 Authenticating with Google Cloud..."
+                    gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+                    gcloud config set project ${PROJECT_ID}
+                    gcloud config set compute/region ${REGION}
+                    gcloud container clusters get-credentials ${CLUSTER_NAME}
+                '''
+                
+                dir('kubernetes') {
+                    sh '''
+                        echo "🚀 Applying Kubernetes manifests..."
+                        kubectl apply -f complete-deploy.yaml
+
+                    '''
+                }
+            }
+        }
+    }
+}
+
+
 
         
 
