@@ -93,6 +93,9 @@ stage('Terraform: Apply Infrastructure') {
         
                         // Change directory to where the Terraform configuration files are located
                         dir('terraform') {
+
+                            export TF_LOG=DEBUG
+                            export TF_LOG_PATH=terraform_debug.log
                             // Initialize Terraform
                             sh 'terraform init'
         
