@@ -12,7 +12,6 @@ pipeline {
     }
 
     stages {
-
         stage('Clone Repo') {
             steps {
                 git branch: 'main', url: "${REPO_URL}"
@@ -77,64 +76,57 @@ pipeline {
             }
         }
 
-
-
-stage('Terraform: Apply Infrastructure') {
-             steps {
+        stage('Terraform: Apply Infrastructure') {
+            steps {
                 script {
                     echo 'Applying Terraform configurations to create GCP resources...'
                     // Ensure you're authenticated and have the necessary permissions to create resources
                     withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         // Authenticate with Google Cloud
                         sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
-        
+
                         // Set the environment variable for Terraform GCP provider to use
                         sh 'export GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS'
-        
+
                         // Change directory to where the Terraform configuration files are located
                         dir('terraform') {
+                            // Set TF_LOG and TF_LOG_PATH for debugging
+                            sh '''
+                                export TF_LOG=DEBUG
+                                export TF_LOG_PATH=terraform_debug.log
+                                # Initialize Terraform
+                                terraform init
 
-                            export TF_LOG=DEBUG
-                            export TF_LOG_PATH=terraform_debug.log
-                            // Initialize Terraform
-                            sh 'terraform init'
-        
-                            // Apply Terraform plan to create resources
-                            sh 'terraform apply -auto-approve -var="project_id=${PROJECT_ID}" -var="region=${REGION}" -var="cluster_name=${CLUSTER_NAME}"'
+                                # Apply Terraform plan to create resources
+                                terraform apply -auto-approve -var="project_id=${PROJECT_ID}" -var="region=${REGION}" -var="cluster_name=${CLUSTER_NAME}"
+                            '''
                         }
                     }
                 }
             }
         }
 
-
         stage('Deploy to GKE with Manifests') {
-    steps {
-        withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-            script {
-                sh '''
-                    echo "🔐 Authenticating with Google Cloud..."
-                    gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-                    gcloud config set project ${PROJECT_ID}
-                    gcloud config set compute/region ${REGION}
-                    gcloud container clusters get-credentials ${CLUSTER_NAME}
-                '''
-                
-                dir('kubernetes') {
-                    sh '''
-                        echo "🚀 Applying Kubernetes manifests..."
-                        kubectl apply -f complete-deploy.yaml
-
-                    '''
+            steps {
+                withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    script {
+                        sh '''
+                            echo "🔐 Authenticating with Google Cloud..."
+                            gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+                            gcloud config set project ${PROJECT_ID}
+                            gcloud config set compute/region ${REGION}
+                            gcloud container clusters get-credentials ${CLUSTER_NAME}
+                        '''
+                        
+                        dir('kubernetes') {
+                            sh '''
+                                echo "🚀 Applying Kubernetes manifests..."
+                                kubectl apply -f complete-deploy.yaml
+                            '''
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-
-
-        
-
     }
 }
