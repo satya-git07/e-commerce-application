@@ -20,7 +20,7 @@ EXPOSE ${QUOTE_PORT}
 FROM composer:2.7 AS vendor
 
 WORKDIR /tmp/
-COPY ./src/quote/composer.json .
+COPY . .
 
 RUN composer install \
     --ignore-platform-reqs \
@@ -32,4 +32,4 @@ RUN composer install \
 
 FROM base AS final
 COPY --from=vendor /tmp/vendor/ ./vendor/
-COPY ./src/quote/ /var/www
+COPY . /var/www

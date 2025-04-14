@@ -1,24 +1,34 @@
-// Copyright The OpenTelemetry Authors
-// SPDX-License-Identifier: Apache-2.0
-
 using Accounting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-Console.WriteLine("Accounting service started");
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-Environment.GetEnvironmentVariables()
-    .FilterRelevant()
-    .OutputInOrder();
-
-var host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(services =>
+// Explicit Main method required for entry point
+public class Program
+{
+    public static void Main(string[] args)
     {
-        services.AddSingleton<Consumer>();
-    })
-    .Build();
+        Console.WriteLine("Accounting service started");
 
-var consumer = host.Services.GetRequiredService<Consumer>();
-consumer.StartListening();
+        // Set up the environment
+        Environment.GetEnvironmentVariables()
+            .FilterRelevant()
+            .OutputInOrder();
 
-host.Run();
+        // Create and run the host
+        var host = Host.CreateDefaultBuilder(args)
+            .ConfigureServices(services =>
+            {
+                services.AddSingleton<Consumer>();
+            })
+            .Build();
+
+        var consumer = host.Services.GetRequiredService<Consumer>();
+        consumer.StartListening();
+
+        host.Run();
+    }
+}
+

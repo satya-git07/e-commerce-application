@@ -7,11 +7,7 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <PublishTrimmed>false</PublishTrimmed>
-    <ProtosDir>$(ProjectDir)..\pb</ProtosDir>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="!Exists('$(ProtosDir)')">
-    <ProtosDir>..\..\..\pb</ProtosDir>
+    <ProtosDir>./pb</ProtosDir> <!-- FIXED here -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,6 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="$(ProtosDir)\**\*.proto" GrpcServices="Both" />
+    <Protobuf Include="$(ProtosDir)/**/*.proto" GrpcServices="Both" />
   </ItemGroup>
+
 </Project>
+

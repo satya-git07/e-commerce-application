@@ -1,0 +1,6 @@
+projectKey=product-catalog
+serverUrl=http://localhost:9000
+serverVersion=25.4.0.105899
+dashboardUrl=http://localhost:9000/dashboard?id=product-catalog
+ceTaskId=b6822fb3-9e82-4114-93cf-30ef7c88f5ef
+ceTaskUrl=http://localhost:9000/api/ce/task?id=b6822fb3-9e82-4114-93cf-30ef7c88f5ef

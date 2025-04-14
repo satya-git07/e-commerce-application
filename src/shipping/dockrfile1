@@ -1,0 +1,24 @@
+# Stage 1 - Build
+FROM rust:1.74 as builder
+WORKDIR /app
+COPY . .
+# Install protoc
+RUN apt-get update && apt-get install -y protobuf-compiler
+RUN cargo build --release
+
+# Stage 2 - Runtime
+FROM debian:bookworm-slim
+WORKDIR /app
+
+# Copy only the built binary
+COPY --from=builder /app/target/release/shipping /app/shipping
+
+# Add gRPC health probe
+ENV GRPC_HEALTH_PROBE_VERSION=v0.4.24
+RUN apt-get update && apt-get install -y wget ca-certificates && \
+    wget -qO /bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+    chmod +x /bin/grpc_health_probe
+
+EXPOSE ${SHIPPING_PORT}
+ENTRYPOINT ["/app/shipping"]
+
