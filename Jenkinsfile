@@ -84,7 +84,7 @@ stage('Terraform: Apply Infrastructure') {
                 script {
                     echo 'Applying Terraform configurations to create GCP resources...'
                     // Ensure you're authenticated and have the necessary permissions to create resources
-                    withCredentials([file(credentialsId: 'gcp-sa', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         // Authenticate with Google Cloud
                         sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
         
