@@ -5,7 +5,7 @@ pipeline {
         REPO_URL = 'https://github.com/satya-git07/e-commerce-application.git'
         DOCKER_HUB_USER = 'satyadockerhub07'
         CREDENTIALS_ID = 'docker-credentials'
-        GOOGLE_CREDENTIALS = credentials('gcp-sa')
+        GOOGLE_CREDENTIALS = credentials('gcp-key')
         PROJECT_ID = 'lyrical-bus-452711-c5'
         REGION = 'us-west3-c'
         CLUSTER_NAME = 'my-cluster11'
