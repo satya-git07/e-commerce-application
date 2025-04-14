@@ -9,3 +9,8 @@ variable "region" {
   type        = string
   default = "us-west3-c"
 }
+variable "cluster_name" {
+description = "The region where the resources will be created"
+  type        = string
+  default = "my-cluster11"
+}
