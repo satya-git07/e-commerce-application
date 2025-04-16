@@ -6,3 +6,6 @@
     "@kt3k/license-checker": "^3.2.2"
   }
 }
+"scripts": {
+  "test": "jest"
+}
