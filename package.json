@@ -1,11 +1,13 @@
 {
+  "name": "your-project-name",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "jest"
+  },
   "devDependencies": {
     "markdown-link-check": "^3.9.3",
     "markdown-toc": "^1.2.0",
     "markdownlint-cli": "0.37.0",
     "@kt3k/license-checker": "^3.2.2"
   }
-}
-"scripts": {
-  "test": "jest"
 }
